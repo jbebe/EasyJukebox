@@ -12,8 +12,8 @@
 ```
 #### Okay but how does it look?
 
-<img src="http://raw.githubusercontent.com/jbebe/EasyJukebox/master/control.png" width="250">
-<img src="http://raw.githubusercontent.com/jbebe/EasyJukebox/master/control2.png" width="256">
+<img src="https://raw.githubusercontent.com/jbebe/EasyJukebox/master/control.png" width="250">
+<img src="https://raw.githubusercontent.com/jbebe/EasyJukebox/master/control2.png" width="256">
 
 #### Tools:
 

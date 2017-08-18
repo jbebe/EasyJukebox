@@ -12,9 +12,8 @@
 ```
 #### Okay but how does it look?
 
-<img style="float:left" src="https://raw.githubusercontent.com/jbebe/EasyJukebox/master/control.png">
-<img style="float:left" src="https://raw.githubusercontent.com/jbebe/EasyJukebox/master/control2.png">
-<span style="clear:both">&nbsp;</span>
+<img src="http://raw.githubusercontent.com/jbebe/EasyJukebox/master/control.png" width="250">
+<img src="http://raw.githubusercontent.com/jbebe/EasyJukebox/master/control2.png" width="256">
 
 #### Tools:
 

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Remote Control - Easy Jukebox</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" crossorigin="anonymous"></script>
+		<script>
+			/*! jQuery UI Touch Punch 0.2.3
+			 *  Depends:
+			 *  jquery.ui.widget.js
+			 *  jquery.ui.mouse.js
+			 */
+			!function(a){function f(a,b){if(!(a.originalEvent.touches.length>1)){a.preventDefault();var c=a.originalEvent.changedTouches[0],d=document.createEvent("MouseEvents");d.initMouseEvent(b,!0,!0,window,1,c.screenX,c.screenY,c.clientX,c.clientY,!1,!1,!1,!1,0,null),a.target.dispatchEvent(d)}}if(a.support.touch="ontouchend"in document,a.support.touch){var e,b=a.ui.mouse.prototype,c=b._mouseInit,d=b._mouseDestroy;b._touchStart=function(a){var b=this;!e&&b._mouseCapture(a.originalEvent.changedTouches[0])&&(e=!0,b._touchMoved=!1,f(a,"mouseover"),f(a,"mousemove"),f(a,"mousedown"))},b._touchMove=function(a){e&&(this._touchMoved=!0,f(a,"mousemove"))},b._touchEnd=function(a){e&&(f(a,"mouseup"),f(a,"mouseout"),this._touchMoved||f(a,"click"),e=!1)},b._mouseInit=function(){var b=this;b.element.bind({touchstart:a.proxy(b,"_touchStart"),touchmove:a.proxy(b,"_touchMove"),touchend:a.proxy(b,"_touchEnd")}),c.call(b)},b._mouseDestroy=function(){var b=this;b.element.unbind({touchstart:a.proxy(b,"_touchStart"),touchmove:a.proxy(b,"_touchMove"),touchend:a.proxy(b,"_touchEnd")}),d.call(b)}}}(jQuery);
+		</script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+		<style type="text/css">
+			body {
+				background-color: #fff;
+				margin: 0;
+				overflow: scroll-y;
+			}
+			@font-face {
+			  font-family: 'entypo';
+			  src: url('https://cdnjs.cloudflare.com/ajax/libs/entypo/2.0/entypo.eot?8644018');
+			  src: url('https://cdnjs.cloudflare.com/ajax/libs/entypo/2.0/entypo.eot?8644018#iefix') format('embedded-opentype'),
+				   url('https://cdnjs.cloudflare.com/ajax/libs/entypo/2.0/entypo.woff?8644018') format('woff'),
+				   url('https://cdnjs.cloudflare.com/ajax/libs/entypo/2.0/entypo.ttf?8644018') format('truetype'),
+				   url('https://cdnjs.cloudflare.com/ajax/libs/entypo/2.0/entypo.svg?8644018#entypo') format('svg');
+			  font-weight: normal;
+			  font-style: normal;
+			}
+			[class^="icon-"]:before, [class*=" icon-"]:before {
+				font-family: "entypo";
+				font-style: normal;
+				font-weight: normal;
+				speak: none;
+			}
+			.icon-menu:before {
+				content: '\2630';
+			}
+			.icon-user:before {
+				content: '\1F464';
+			}
+			.list-group-item {
+				padding: .75rem 0.5rem;
+			}
+			#playlist > .list-group-item:first-child {
+				z-index: 2;
+				color: #fff;
+				background-color: #007bff;
+				border-color: #007bff;
+			}
+		</style>
+	</head>
+	<body>
+		<div style="margin:0 1rem">
+			<h4 class="text-center" style="margin: 0.8rem 0;">Hello RandomUser123!</h4>
+			<div class="alert alert-warning" role="alert" style="margin: 0.7rem 0">
+			  <strong>Help: </strong>
+				Choose mode to send media to the queue. 
+				Upload a file that you can pick from storage later. 
+				Send in a Youtube url. 
+				Pick media from the storage.
+			</div>
+			
+			<!-- Nav tabs -->
+			<ul class="nav nav-tabs" role="tablist">
+			  <li class="nav-item">
+				<a class="nav-link active" data-toggle="tab" href="#home" role="tab">Upload</a>
+			  </li>
+			  <li class="nav-item">
+				<a class="nav-link" data-toggle="tab" href="#profile" role="tab">Youtube</a>
+			  </li>
+			  <li class="nav-item">
+				<a class="nav-link" data-toggle="tab" href="#messages" role="tab">Storage</a>
+			  </li>
+			</ul>
+
+			<!-- Tab panes -->
+			<div class="tab-content" style="padding:1rem 1rem">
+				<div class="tab-pane active" id="home" role="tabpanel">
+					<form enctype="multipart/form-data" onsubmit="OnSubmitMedia.call(this, event)">
+						<input name="file" type="file" />
+						<input type="submit" value="Upload"/>
+						<progress id="upload-progress" value="0"></progress>
+					</form>
+				</div>
+				<div class="tab-pane" id="profile" role="tabpanel">
+					<form onsubmit="OnSubmitYoutubeUrl.call(this, event)">
+						<input name="url" type="text" />
+						<input type="submit" value="Send"/>
+					</form>
+				</div>
+				<div class="tab-pane" id="messages" role="tabpanel">
+					<div class="well" style="max-height:20rem;overflow-y:scroll;">
+						<div id="storage" class="list-group"></div>
+					</div>
+				</div>
+			</div>
+			<b>Playlist:</b>
+			<div id="playlist" class="list-group"></div>
+		</div>
+		
+		<span style="display:hidden">
+			<div id="youtube-info"></div>
+		</span>
+		<script src="https://www.youtube.com/player_api"></script>
+		<script>
+			// a usernek kell egy unique id. ez lehet nick név vagy generált név
+			// ez alapján lehet megadni, hogy a listában ki melyik számot kérte eddig
+			// ha nick nevet ad meg, a szervernek ellenőriznie kell, hogy nem-e létezik már
+			var playlist = $('#playlist');
+			playlist.sortable({
+				items: 'a:not(:first-child)',
+				update: function listChanged(evt, ui) {
+					console.log('list order changed, new pos: ' + ui.item.index());
+				}
+			});
+			
+			// websocket init
+			var jukeboxWS = new WebSocket('ws://' + location.hostname);
+			jukeboxWS.onopen = function (event) {			
+				console.log('Websocket is loaded.');
+				jukeboxWS.send(JSON.stringify({
+					client: 'control',
+					type: 'playlist-update'
+				}));
+				jukeboxWS.send(JSON.stringify({
+					client: 'control',
+					type: 'storage-update'
+				}));
+			};
+			jukeboxWS.onmessage = function(evt) {
+				console.log('Message recieved: ' + evt.data);
+				var message = JSON.parse(evt.data);
+				switch (message.type){
+					case 'storage-update':
+						UpdateStorage(message.storage);
+						break;
+					case 'playlist-update':
+						UpdatePlaylist(message.playlist);
+						break;
+				}
+			}
+			$(window).on('beforeunload', function(evt) {
+				jukeboxWS.close();
+			});
+			
+			function UpdateStorage(mediaList){
+				var storage = $('#storage');
+				storage.empty();
+				mediaList.forEach(media => {
+					storage.append($('<a href="#" class="list-group-item list-group-item-action" onclick="OnSubmitStorage.call(this, event)">' + media.title + '</a>'));
+				});
+			}
+			
+			function UpdatePlaylist(list){
+				var playlist = $('#playlist');
+				playlist.empty();
+				list.forEach(media => {
+					playlist.append($('<a href="#" class="list-group-item list-group-item-action"><span class="icon-menu"></span> ' + media.title + '</a>'));
+				});
+			}
+			
+			function GetYouTubeVideoInfo(videoId, callback){
+				if (!window.ytPlayer){
+					var ytPlayer = new YT.Player('youtube-info', {
+						'height': 1,
+						'width': 1,
+						'videoId': videoId,
+						'playerVars': {
+							autoplay: 0
+						},
+						'events': {
+							onReady: function(){
+								var result = {
+									duration: ytPlayer.getDuration(),
+									title: ytPlayer.getVideoData().title
+								};
+								ytPlayer.destroy();
+								callback(result);
+							}
+						}
+					});
+				}
+			}
+			
+			function OnSubmitMedia(evt){
+				evt.preventDefault();
+				var form = this;
+				var progress = $('#upload-progress');
+				$.ajax({
+					// Your server script to process the upload
+					url: '/upload',
+					type: 'POST',
+
+					// Form data
+					data: new FormData(form),
+
+					// Tell jQuery not to process data or worry about content-type
+					// You *must* include these options!
+					cache: false,
+					contentType: false,
+					processData: false,
+
+					// Custom XMLHttpRequest
+					xhr: function() {
+						var myXhr = $.ajaxSettings.xhr();
+						if (myXhr.upload) {
+							// For handling the progress of the upload
+							myXhr.upload.addEventListener('progress', function(e) {
+								if (e.lengthComputable) {
+									progress.attr({
+										value: e.loaded,
+										max: e.total,
+									});
+								}
+							} , false);
+						}
+						return myXhr;
+					},
+				});
+				return false;
+			}
+			
+			function OnSubmitStorage(evt){
+				evt.preventDefault();
+				var title = $(this).text();
+				jukeboxWS.send(JSON.stringify({
+					client: 'control',
+					type: 'playlist-add',
+					'media-type': 'storage',
+					id: title,
+					title: title
+				}));
+				
+				return false;
+			}
+			
+			function OnSubmitYoutubeUrl(evt){
+				evt.preventDefault();
+				var urlInput = $('input[name=url]', this);
+				var youtubeUrl = GetYouTubeIdFromUrl(urlInput.val());
+				GetYouTubeVideoInfo(youtubeUrl, function(informations){
+					jukeboxWS.send(JSON.stringify({
+						client: 'control',
+						type: 'playlist-add',
+						'media-type': 'youtube',
+						id: youtubeUrl,
+						title: informations.title
+					}));
+					urlInput.val('');
+				});
+				return false;
+			}
+			
+			function GetYouTubeIdFromUrl(youtubeUrl){
+				if (youtubeUrl.includes('youtu.be')){
+					// https://youtu.be/kxX7JTYViwI
+					return GetUrlData(youtubeUrl).pathname.slice('/'.length);
+				}
+				if (youtubeUrl.includes('youtube.')){
+					if (youtubeUrl.includes('/embed/')){
+						// https://www.youtube.com/embed/kxX7JTYViwI
+						return GetUrlData(youtubeUrl).pathname.slice('/embed/'.length)
+					}
+					if (youtubeUrl.includes('/watch?')){
+						// https://www.youtube.com/watch?v=kxX7JTYViwI
+						return GetUrlData(youtubeUrl).pathname.slice('/embed/'.length)
+					}
+				}
+				// kxX7JTYViwI
+				return youtubeUrl;
+			}
+			
+			function GetUrlData(href){
+				var parser = document.createElement('a');
+				parser.href = href;
+				var result = {
+					protocol: parser.protocol,
+					host: parser.host,
+					hostname: parser.hostname,
+					port: parser.port,
+					pathname: parser.pathname,
+					hash: parser.hash,
+					search: parser.search,
+					origin: parser.origin,
+				};
+				parser = null;
+				return result;
+			}
+		</script>
+	</body>
+</html>

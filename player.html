@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Player - Easy Jukebox</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style type="text/css">
+		body {
+			margin: 0;
+			overflow: hidden;
+		}
+	</style>
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  </head>
+  <body>
+	<div id="media-players">
+		<div 
+			id="youtube-player"
+			style="display:none">
+		</div>
+		<script src="https://www.youtube.com/player_api"></script>
+		<video 
+			id="video-player"
+			style="display:none">
+		</video>
+		<audio 
+			id="mp3-player"
+			controls
+			autoplay
+			style="display:none">
+			Your browser does not support the audio element.
+		</audio>
+	</div>
+	<script>
+		// youtube init
+		// https://developers.google.com/youtube/iframe_api_reference
+		// https://developers.google.com/youtube/player_parameters
+		var youtubePlayerElem = $('#youtube-player');
+		youtubePlayerElem
+			.width($(window).width())
+			.height($(window).height())
+			.css('display', 'block');
+		function onYouTubePlayerAPIReady() {
+			window.ytPlayer = new YT.Player('youtube-player', {
+				//videoId: 'QbeBhdjW1_w',
+				playerVars: {
+					autoplay: 1,
+					showinfo: 0,
+					//controls: 0,
+					disablekb: 1,
+					modestbranding: 1,
+				},
+				events: {
+					onReady: function onYouTubeVideoReady(){
+						InitWebSocket();
+						InitAudio();
+					},
+					onStateChange: OnYoutubeVideoStateChange
+				}
+			});
+		}
+		
+		function OnYoutubeVideoStateChange(evt){
+			var endedState = 0;
+			var videoState = evt.data;
+			if (evt.target.getCurrentTime() == 0 && evt.target.getDuration() == 0){
+				return;
+			}
+			if (videoState === endedState){
+				console.log('Youtube video ended. Getting next.');
+				jukeboxWS.send(JSON.stringify({
+					client: 'player',
+					type: 'get-next'
+				}));
+			}
+		}
+		
+		function PlayYoutube(mediaObject){
+			/* mediaObject = {
+				id: 'cvvd-9azD1M'
+			}*/
+			console.log('Playing Youtube video...');
+			$('#media-players *:not(#youtube-player)').hide();
+			ytPlayer.loadVideoById({
+				'videoId': mediaObject.id,
+				'suggestedQuality': 'default' // this way it won't lag
+			});
+		}
+		
+		function PlayStorage(mediaObject){
+			/* mediaObject = {
+				id: 'Il Divo - Festa a casa di Cirino Pomicino.mp3'
+			}*/
+			if (['mp3'].includes(mediaObject.id.slice(-3).toLowerCase())){
+				$('#media-players *:not(#mp3-player)').hide();
+				ytPlayer.clearVideo();
+				$('#video-player').trigger('pause');
+				var mp3Player = $('#mp3-player');
+				mp3Player.show();
+				mp3Player.attr('src', '/storage/' + mediaObject.id);
+				/*mp3Player[0].autoplay = true;
+				mp3Player.on('loadstart', function(evt){
+					console.log('loadstart fired');
+					$(this)[0].play();
+				});*/
+			}
+		}
+		
+		function InitWebSocket(){
+			window.jukeboxWS = new WebSocket('ws://' + location.hostname);
+			jukeboxWS.onopen = function (evt) {			
+				console.log('Websocket opened');
+				// get first media from server
+				jukeboxWS.send(JSON.stringify({
+					client: 'player',
+					type: 'get-next'
+				}));
+			};
+			jukeboxWS.onmessage = function(evt) {
+				var message = JSON.parse(evt.data);
+				console.log('Websocket message received (' + evt.data + '). Type is ' + message.type);
+				switch(message.type) {
+					case 'youtube':
+						PlayYoutube(message);
+						break;
+					case 'storage':
+						PlayStorage(message);
+						break;
+				}
+			}
+			$(window).on('beforeunload', function(evt) {
+				jukeboxWS.close();
+			});
+		}
+		
+		function InitAudio(){
+			$('#mp3-player').on('ended', function(){
+				console.log('Audio ended. Getting next.');
+				jukeboxWS.send(JSON.stringify({
+					client: 'player',
+					type: 'get-next'
+				}));
+			});
+		}
+	
+	</script>
+  </body>
+</html>

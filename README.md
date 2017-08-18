@@ -11,9 +11,11 @@
 +--------------+                    +-------------------+                    +---------------+
 ```
 #### Okay but how does it look?
+|Storage|YouTube|
+|:---:|:---:|
+|<img src="https://raw.githubusercontent.com/jbebe/EasyJukebox/master/control.png" width="100%">|<img src="https://raw.githubusercontent.com/jbebe/EasyJukebox/master/control2.png" width="100%">|
 
-<img src="https://raw.githubusercontent.com/jbebe/EasyJukebox/master/control.png" width="250">
-<img src="https://raw.githubusercontent.com/jbebe/EasyJukebox/master/control2.png" width="256">
+The player is just a big screen in the browser, I leave it to your imagination.
 
 #### Tools:
 

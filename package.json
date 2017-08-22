@@ -1,12 +1,14 @@
 {
-  "name": "easyjukebox",
-  "title": "EasyJukebox - An office jukebox",
-  "description": "With this program you can play music remotely, easily.",
-  "author": "Bálint Juhász",
-  "license": "MIT",
-  "version": "0.0.1",
-  "dependencies": {
-    "ws": ">=3.1.0",
-	"express": ">=4.15.4"
-  }
+	"name": "easyjukebox",
+	"title": "EasyJukebox - An office jukebox",
+	"description": "With this program you can play music remotely, easily.",
+	"author": "Bálint Juhász",
+	"license": "MIT",
+	"version": "0.0.1",
+	"private": true,
+	"dependencies": {
+		"ws": "^3.1.0",
+		"express": "^4.15.4",
+		"lokijs": "^1.5.0"
+	}
 }

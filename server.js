@@ -1,25 +1,20 @@
 const express = require('express');
-const http = require('http');
 
 const routing = require('./src/routing');
-const { WSManager } = require('./src/websocket');
+const { JukeboxManager } = require('./src/jukebox');
 
-((args) => {
+(args => {
     try {
         // create express web server
         const app = express();
 
-        // routing
-        routing.init(app);
+        // basic routing (no parametric callbacks)
+        routing.basic(app);
 
-        // create server & open port
-        const server = http.createServer(app);
-        server.listen(80, function listening() {
-            console.log('HTTP: listening on %d', server.address().port);
-        });
+        // instantiate server logic
+        const port = 80;
+        new JukeboxManager(port, app);
 
-        // websocket
-        let wsManager = new WSManager({server});
     } catch (ex) {
         console.log('GLOB: error', ex);
     }

@@ -1,6 +1,42 @@
 ## EasyJukebox
 
-#### Structure:
+**Table of contents**
+
+1. [Introduction](#introduction)
+2. [Some paragraph](#paragraph1)
+    1. [Sub paragraph](#subparagraph1)
+3. [Another paragraph](#paragraph2)
+---
+
+#### Objects:
+
+* **Playlist item**
+  ```text
+  type: 'youtube' | 'storage'
+  id: '<youtube-video-id>' | '<file-hash>'
+  title: '<youtube-video-title>' | '<filename w/o extension>'
+  interval: null (default) | { start: <seconds>, end: <seconds> }
+  duration: <seconds>,
+  added: '<utc-date>' (stackoverflow.com/a/13646568/1549007)
+  ```
+
+* **Storage item (media)**
+   ```text
+   type: 'audio' | 'video'
+   format: 'mp3' | 'mp4' (poor support for all format)
+   id: '<file-hash>'
+   title: '<filename w/o extension>'
+   filename: '<filename>' (to be able to load file from path)
+   ```
+   
+* **Next media**
+   ```text
+   type: 'youtube' | 'storage'
+   id: '<youtube-video-id>' | '<file-hash>'
+   format: 'mp3' | 'mp4' (only when .type is 'storage')
+   ```
+
+#### Structure: <a id="introduction"></a>
 
 ```
    player.html                             server.js                           control.html

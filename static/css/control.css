@@ -1,0 +1,36 @@
+body {
+	background-color: #fff;
+	margin: 0;
+	overflow: scroll-y;
+}
+@font-face {
+  font-family: 'entypo';
+  src: url('https://cdnjs.cloudflare.com/ajax/libs/entypo/2.0/entypo.eot?8644018');
+  src: url('https://cdnjs.cloudflare.com/ajax/libs/entypo/2.0/entypo.eot?8644018#iefix') format('embedded-opentype'),
+	   url('https://cdnjs.cloudflare.com/ajax/libs/entypo/2.0/entypo.woff?8644018') format('woff'),
+	   url('https://cdnjs.cloudflare.com/ajax/libs/entypo/2.0/entypo.ttf?8644018') format('truetype'),
+	   url('https://cdnjs.cloudflare.com/ajax/libs/entypo/2.0/entypo.svg?8644018#entypo') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+[class^="icon-"]:before, [class*=" icon-"]:before {
+	font-family: "entypo";
+	font-style: normal;
+	font-weight: normal;
+	speak: none;
+}
+.icon-menu:before {
+	content: '\2630';
+}
+.icon-user:before {
+	content: '\1F464';
+}
+.list-group-item {
+	padding: .75rem 0.5rem;
+}
+#playlist > .list-group-item:first-child {
+	z-index: 2;
+	color: #fff;
+	background-color: #007bff;
+	border-color: #007bff;
+}

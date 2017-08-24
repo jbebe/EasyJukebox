@@ -32,7 +32,7 @@ exports.DBManager = class DBManager {
         }
     }
 
-    rebuildStorage(){
+    rebuildStorage(readyCallback = () => {}){
         // empty the collection
         this.storage.clear();
         // read in all media files
@@ -74,7 +74,26 @@ exports.DBManager = class DBManager {
                         .slice(0, -(EOL.length))
                 );
             }
+            readyCallback();
         });
+    }
+
+    addMediaToStorage(mediaObj, readyCallback){
+        let crcFilename = crc.crc32(mediaObj.filename).toString(16);
+        let isNewFile = this.storage.find({ id: crcFilename }).length === 0;
+        if (isNewFile){
+            console.log('JM: this is a new file');
+            fs.writeFile(mediaObj.fullpath, mediaObj.data, err => {
+                if (err) {
+                    throw err;
+                }
+                this.rebuildStorage(() => {
+                    readyCallback(crcFilename);
+                });
+            });
+        } else {
+            console.log('JM: this media is already in the storage');
+        }
     }
 
     static clearDbMetadata(dbItem){

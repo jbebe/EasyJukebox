@@ -15,6 +15,30 @@ function getUrlData(href){
     return result;
 }
 
+function getYouTubeIdFromInput(youtubeUrl){
+    if (youtubeUrl.includes('youtu.be')){
+        // https://youtu.be/jR1jn8tfrLg?t=1h14m19s
+        let urlData = getUrlData(youtubeUrl);
+        return urlData.pathname.slice('/'.length);
+    }
+    if (youtubeUrl.includes('youtube.com/watch')){
+        // https://www.youtube.com/watch?v=jR1jn8tfrLg&t=4459s
+        let urlData = getUrlData(youtubeUrl);
+        return urlData.search
+            .slice('?'.length)
+            .split('&')
+            .filter(p => p.startsWith('v='))
+            .map(p => p.slice('v='.length))[0];
+    }
+    if (youtubeUrl.includes('youtube.com/embed')) {
+        // https://www.youtube.com/embed/jR1jn8tfrLg?start=60
+        let urlData = getUrlData(youtubeUrl);
+        return urlData.pathname.slice('/embed/'.length);
+    }
+    // jR1jn8tfrLg
+    return youtubeUrl;
+}
+
 function getYouTubeInfo(videoId, callback){
     let ytPlayer = new YT.Player('youtube-info', {
         'height': 1,
@@ -42,6 +66,7 @@ class RemoteControl {
 	constructor(){
         this.initPlaylist();
         this.initWebSocket();
+        this.initMediaUpload();
 	}
 
 	// initialization
@@ -65,6 +90,74 @@ class RemoteControl {
             this.wsClient.close();
         });
 	}
+
+	initYouTubeSubmit(){
+        let form = $('#tab-youtube > form:first-child');
+        form.on('submit', evt => {
+            evt.preventDefault();
+            let urlInput = $('input[name=url]', form);
+            let youtubeUrl = getYouTubeIdFromInput(urlInput.val());
+            getYouTubeInfo(youtubeUrl, videoInfo => {
+                this.wsClient.send(JSON.stringify({
+                    client: 'control',
+                    type: 'playlist-add',
+                    data: {
+                        type: 'youtube',
+                        id: youtubeUrl,
+                        title: videoInfo.title
+                    }
+                }));
+                urlInput.val('');
+            });
+            return false;
+        })
+    }
+
+    initMediaUpload(){
+        let form = $('#tab-upload > form:first-child');
+        let fileElem = form.find('input[type=file]');
+        let progress = $('#upload-progress');
+        fileElem.on('change', evt => {
+            form.find('.alert').hide(); // hide all previous alert messages
+            let fileList = fileElem[0].files;
+            if (fileList.length !== 1){
+                form.find('.alert-danger')
+                    .text('You have to select a file before uploading it!')
+                    .show();
+                return;
+            }
+            let file = fileList[0];
+            let reader = new FileReader();
+            reader.onload = () => {
+                $.ajax({
+                    url: '/upload',
+                    type: 'POST',
+                    processData: false,
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        data: btoa(reader.result),
+                        filename: file.name
+                    }),
+                    xhr: function() {
+                        let myXhr = $.ajaxSettings.xhr();
+                        if (myXhr.upload) {
+                            // For handling the progress of the upload
+                            myXhr.upload.addEventListener('progress', function(e) {
+                                if (e.lengthComputable) {
+                                    progress.attr({
+                                        value: e.loaded,
+                                        max: e.total,
+                                    });
+                                }
+                            } , false);
+                        }
+                        return myXhr;
+                    },
+                });
+            };
+            reader.readAsBinaryString(file);
+        });
+    }
 
 	onWSConnectedWrapper(){
     	return evt => {
@@ -137,78 +230,3 @@ class RemoteControl {
 (() => {
 	window.rc = new RemoteControl();
 })();
-
-function OnSubmitMedia(evt){
-	evt.preventDefault();
-	var form = this;
-	var progress = $('#upload-progress');
-	$.ajax({
-		// Your server script to process the upload
-		url: '/upload',
-		type: 'POST',
-
-		// Form data
-		data: new FormData(form),
-
-		// Tell jQuery not to process data or worry about content-type
-		// You *must* include these options!
-		cache: false,
-		contentType: false,
-		processData: false,
-
-		// Custom XMLHttpRequest
-		xhr: function() {
-			var myXhr = $.ajaxSettings.xhr();
-			if (myXhr.upload) {
-				// For handling the progress of the upload
-				myXhr.upload.addEventListener('progress', function(e) {
-					if (e.lengthComputable) {
-						progress.attr({
-							value: e.loaded,
-							max: e.total,
-						});
-					}
-				} , false);
-			}
-			return myXhr;
-		},
-	});
-	return false;
-}
-
-function OnSubmitYoutubeUrl(evt){
-	evt.preventDefault();
-	let urlInput = $('input[name=url]', this);
-	let youtubeUrl = GetYouTubeIdFromUrl(urlInput.val());
-    getYouTubeInfo(youtubeUrl, videoInfo => {
-		jukeboxWS.send(JSON.stringify({
-			client: 'control',
-			type: 'playlist-add',
-			'media-type': 'youtube',
-			id: youtubeUrl,
-			title: videoInfo.title
-		}));
-		urlInput.val('');
-	});
-	return false;
-}
-
-function GetYouTubeIdFromUrl(youtubeUrl){
-	if (youtubeUrl.includes('youtu.be')){
-		// https://youtu.be/kxX7JTYViwI
-		return getUrlData(youtubeUrl).pathname.slice('/'.length);
-	}
-	if (youtubeUrl.includes('youtube.')){
-		if (youtubeUrl.includes('/embed/')){
-			// https://www.youtube.com/embed/kxX7JTYViwI
-			return getUrlData(youtubeUrl).pathname.slice('/embed/'.length)
-		}
-		if (youtubeUrl.includes('/watch?')){
-			// https://www.youtube.com/watch?v=kxX7JTYViwI
-			return getUrlData(youtubeUrl).pathname.slice('/embed/'.length)
-		}
-	}
-	// kxX7JTYViwI
-	return youtubeUrl;
-}
-

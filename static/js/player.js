@@ -58,21 +58,22 @@ function PlayYoutube(playlistItem){
     });
 }
 
-function PlayStorage(mediaObject){
-    /* mediaObject = {
-        id: 'Il Divo - Festa a casa di Cirino Pomicino.mp3'
-    }*/
-    console.log('Playing Storage media');
-    [HideYoutube, HideVideo].forEach(fn => fn());
-    let mp3Player = $('#mp3-player');
-    mp3Player.show();
-    mp3Player.attr('src', '/media/' + mediaObject.id);
-    mp3Player[0].play();
-    /*mp3Player[0].autoplay = true;
-    mp3Player.on('loadstart', function(evt){
-        console.log('loadstart fired');
-        $(this)[0].play();
-    });*/
+function PlayStorage(message){
+    if (message.format === 'mp3'){
+        console.log('Playing mp3');
+        [HideYoutube, HideVideo].forEach(fn => fn());
+        let mp3Player = $('#mp3-player');
+        mp3Player.show();
+        mp3Player.attr('src', '/media/' + message.id);
+        mp3Player[0].play();
+    } else {
+        console.log('Playing mp4');
+        [HideYoutube, HideAudio].forEach(fn => fn());
+        let videoPlayer = $('#video-player');
+        videoPlayer.show();
+        videoPlayer.attr('src', '/media/' + message.id);
+        videoPlayer[0].play();
+    }
 }
 
 function InitWebSocket(){

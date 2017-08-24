@@ -26,32 +26,32 @@
 			<!-- Nav tabs -->
 			<ul class="nav nav-tabs" role="tablist">
 			  <li class="nav-item">
-				<a class="nav-link active" data-toggle="tab" href="#home" role="tab">Upload</a>
+				<a class="nav-link active" data-toggle="tab" href="#tab-upload" role="tab">Upload</a>
 			  </li>
 			  <li class="nav-item">
-				<a class="nav-link" data-toggle="tab" href="#profile" role="tab">Youtube</a>
+				<a class="nav-link" data-toggle="tab" href="#tab-youtube" role="tab">Youtube</a>
 			  </li>
 			  <li class="nav-item">
-				<a class="nav-link" data-toggle="tab" href="#messages" role="tab">Storage</a>
+				<a class="nav-link" data-toggle="tab" href="#tab-storage" role="tab">Storage</a>
 			  </li>
 			</ul>
 
 			<!-- Tab panes -->
 			<div class="tab-content" style="padding:1rem 1rem">
-				<div class="tab-pane active" id="home" role="tabpanel">
-					<form enctype="multipart/form-data" onsubmit="OnSubmitMedia.call(this, event)">
-						<input name="file" type="file" />
-						<input type="submit" value="Upload"/>
+				<div class="tab-pane active" id="tab-upload" role="tabpanel">
+					<form>
+						<input name="file" type="file">
+						<div class="alert alert-danger" role="alert" style="display:none"></div>
 						<progress id="upload-progress" value="0"></progress>
 					</form>
 				</div>
-				<div class="tab-pane" id="profile" role="tabpanel">
-					<form onsubmit="OnSubmitYoutubeUrl.call(this, event)">
+				<div class="tab-pane" id="tab-youtube" role="tabpanel">
+					<form>
 						<input name="url">
 						<input type="submit" value="Send">
 					</form>
 				</div>
-				<div class="tab-pane" id="messages" role="tabpanel">
+				<div class="tab-pane" id="tab-storage" role="tabpanel">
 					<div class="well" style="max-height:20rem;overflow-y:scroll;">
 						<div id="storage" class="list-group"></div>
 					</div>

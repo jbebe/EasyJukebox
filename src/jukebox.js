@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const http = require('http');
 const WebSocket = require('ws');
 
@@ -135,8 +136,15 @@ exports.JukeboxManager = class JukeboxManager {
         }
         console.log('JM: sending next media');
         let data = DBManager.clearDbMetadata(nextMedia);
-        data = JSON.stringify(data);
-        this.wsPlayer.send(data);
+        if (data.type === 'storage'){
+            data.format = this.dbManager.storage.findOne({ id: data.id }).format;
+        }
+        try {
+            this.wsPlayer.send(JSON.stringify(data));
+        } catch (ex){
+            this.wsPlayer = null;
+            return false;
+        }
         return true;
     }
 
@@ -185,6 +193,34 @@ exports.JukeboxManager = class JukeboxManager {
             let fileId = req.params.fileChecksum;
             let fileName = this.dbManager.storage.findOne({ id: fileId }).filename;
             res.sendFile(path.join(storagePath, fileName));
+        });
+
+        expressApp.use('/upload', (req, res) => {
+            console.log('HTTP: incoming file');
+            let mediaObj = JSON.parse(req.rawBody);
+            mediaObj.data = Buffer.from(mediaObj.data, 'base64');
+            mediaObj.fullpath = path.join(storagePath, mediaObj.filename);
+            this.dbManager.addMediaToStorage(mediaObj, mediaID => {
+                let playlistOldCount = this.dbManager.playlist.count();
+                this.playlistAddFromStorage(mediaID);
+                if (playlistOldCount === 0){
+                    // playlist was empty, now we have to send media without asking
+                    this.sendNextMedia(true);
+                }
+                this.sendPlaylist();
+            });
+        });
+    }
+
+    playlistAddFromStorage(id){
+        let media = this.dbManager.storage.findOne({ id: id });
+        this.dbManager.playlist.insert({
+            type: 'storage',
+            id: id,
+            title: media.title,
+            interval: null,
+            duration: null,
+            added: new Date().toJSON()
         });
     }
 };

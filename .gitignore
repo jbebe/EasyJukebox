@@ -1,3 +1,5 @@
 /.idea/*
 /node_modules/
-/storage/*
+/storage/media/*
+/storage/*.json
+!/storage/**/.gitkeep

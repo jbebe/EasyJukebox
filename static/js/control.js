@@ -67,6 +67,7 @@ class RemoteControl {
         this.initPlaylist();
         this.initWebSocket();
         this.initMediaUpload();
+        this.initYouTubeSubmit();
 	}
 
 	// initialization
@@ -196,6 +197,7 @@ class RemoteControl {
             mediaItem.addClass('list-group-item list-group-item-action');
 			mediaItem.text(media.title);
 			mediaItem.data('id', media.id);
+			mediaItem.data('type', media.type);
 			mediaItem.click(this.onSubmitStorageWrapper());
             storage.append(mediaItem);
         });
@@ -214,11 +216,12 @@ class RemoteControl {
     	return evt => {
             evt.preventDefault();
             let id = $(evt.target).data('id');
+            let type = $(evt.target).data('type');
             this.wsClient.send(JSON.stringify({
                 client: 'control',
                 type: 'playlist-add',
                 data: {
-                    'type': 'storage',
+                    'type': type,
                     id: id
                 }
             }));

@@ -44,10 +44,10 @@ exports.DBManager = class DBManager {
                     let filenameObj = path.parse(filename);
                     let type = null;
                     let format = null;
-                    if (filenameObj.ext === '.mp3'){
+                    if (['.mp3'].includes(filenameObj.ext)){
                         type = 'audio';
                         format = 'mp3';
-                    } else if (filenameObj.ext === '.mp4'){
+                    } else if (['.mp4'].includes(filenameObj.ext)){
                         type = 'video';
                         format = 'mp4';
                     }

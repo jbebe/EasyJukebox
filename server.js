@@ -1,5 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 
 const routing = require('./src/routing');
 const { JukeboxManager } = require('./src/jukebox');

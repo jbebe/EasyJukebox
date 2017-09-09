@@ -12,7 +12,7 @@
 
 * **Playlist item**
   ```text
-  type: 'youtube' | 'storage'
+  type: 'youtube' | 'audio' | 'video'
   id: '<youtube-video-id>' | '<file-hash>'
   title: '<youtube-video-title>' | '<filename w/o extension>'
   interval: null (default) | { start: <seconds>, end: <seconds> }
@@ -23,7 +23,6 @@
 * **Storage item (media)**
    ```text
    type: 'audio' | 'video'
-   format: 'mp3' | 'mp4' (poor support for all format)
    id: '<file-hash>'
    title: '<filename w/o extension>'
    filename: '<filename>' (to be able to load file from path)

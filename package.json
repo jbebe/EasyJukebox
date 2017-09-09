@@ -2,7 +2,7 @@
 	"name": "easyjukebox",
 	"title": "EasyJukebox - An office jukebox",
 	"description": "With this program you can play music remotely, easily.",
-	"author": "B·lint Juh·sz",
+	"author": "B√°lint Juh√°sz",
 	"license": "MIT",
 	"version": "0.0.1",
 	"private": true,
@@ -10,8 +10,6 @@
 		"ws": "^3.1.0",
 		"express": "^4.15.4",
 		"lokijs": "^1.5.0",
-		"crc": "^3.4.4",
-		"axios": "^0.16.2",
-		"body-parser": "^1.17.2"
+		"crc": "^3.4.4"
 	}
 }

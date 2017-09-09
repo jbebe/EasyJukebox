@@ -83,10 +83,10 @@ exports.JukeboxManager = class JukeboxManager {
         let id = message.data.id;
         let type = message.data.type;
         let title = null;
-        if (type === 'storage') {
-            title = this.dbManager.storage.findOne({id: id}).title;
-        } else {
+        if (type === 'youtube') {
             title = message.data.title;
+        } else {
+            title = this.dbManager.storage.findOne({ id: id }).title;
         }
         this.dbManager.playlist.insert({
             type: message.data.type,
@@ -160,7 +160,7 @@ exports.JukeboxManager = class JukeboxManager {
         } else {
             console.log('JM: send storage to all client');
             let that = this;
-            this.wsServer.clients.forEach(wsClient => {
+            this.wsManager.sendToAll(wsClient => {
                 if ((wsClient !== that.wsPlayer) && (wsClient.readyState === WebSocket.OPEN)) {
                     wsClient.send(responseData);
                 }
@@ -208,6 +208,7 @@ exports.JukeboxManager = class JukeboxManager {
                     this.sendNextMedia(true);
                 }
                 this.sendPlaylist();
+                this.sendStorage();
             });
         });
     }
